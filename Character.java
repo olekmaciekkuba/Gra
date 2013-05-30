@@ -23,12 +23,34 @@ public class Character {
      */
     public int y;
     /**
-     * Obrazek postaci
+     * Obrazek postaci 1 lub 2
      */
     public int image;
+    /**
+     * true - uprawnienia admina
+     * false - zwykły użytkownik
+     */
     public boolean admin;
-//    public boolean right_move;
-//    public boolean move;
-//    public boolean attack;
+    /**
+     * true - postac atakuje
+     */
+    public boolean attack;
+    /**
+     * wyswietlana animacja + klatka
+     * 
+     */
     public int a, b;
+    /**
+     * ilosc życia postaci
+     */
+    public int hp;
+    /**
+     * informacja ile razy postac zginela
+     */
+    public int dead;
+    /**
+     * informacja o ilosci fragow
+     */
+    public int frags;
+    public boolean immortal;
 }

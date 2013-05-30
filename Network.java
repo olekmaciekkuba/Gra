@@ -20,8 +20,20 @@ public class Network {
                 kryo.register(CharacterID.class);
                 kryo.register(SendChat.class);
                 kryo.register(SetMap.class);
-                kryo.register((Combat.class));
+                kryo.register(Combat.class);
+                kryo.register(Dead.class);
+                kryo.register(NewPosition.class);
+                kryo.register(Kick.class);
 	}
+        static public class Kick{
+                public String name;
+        }
+        static public class NewPosition{
+                public int x,y,hp;
+        }
+        static public class Dead{
+                public int characterID;
+        }
         static public class Combat{
                 public boolean attack;
         }
@@ -47,8 +59,10 @@ public class Network {
 		public int id, x, y;
 //                public boolean right_move;
 //                public boolean move;
-//                public boolean attack;
+                public boolean attack;
                 public int a, b;
+                public int frags;
+                public int dead;
 	}
 
 	static public class AddCharacter {
@@ -62,6 +76,7 @@ public class Network {
 	static public class MoveCharacter {
 		public int x, y;
                 public int a, b;
+                public boolean attack;
                 MoveCharacter(){
                     x=0; y=0;
                 }

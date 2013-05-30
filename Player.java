@@ -14,12 +14,13 @@ public class Player {
 
     private int x, vx = 3;     //definicje wspolrzednych, predkosci, szerokosci,
     private int y, vy = 3;    //wysokosci i licznika potrzebnego przy skakaniu
-    private int w = 49, h = 74;
+    private int w = 50, h = 74;
     private int counter;
     private int ch_x;
     private int ch_y;
     private int a, b;
     private boolean ready;  //gotowosc do skoku
+   
     public boolean admin;
 
     Player() //konstruktory, uzywam drugiego
@@ -173,7 +174,22 @@ public class Player {
         this.a = a;
     }
 
+    public int get_a(){
+        return a;
+    }
     public void set_b(int b) {
         this.b = b;
     }
+    public int get_b(){
+        return b;
+    }
+    public void set_x(int x){
+        this.x = x;
+    }
+    public void set_y(int y){
+        this.y = y;
+    }
+    
+  
+    
 }

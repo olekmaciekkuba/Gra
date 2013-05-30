@@ -113,6 +113,10 @@ public class ServerList extends javax.swing.JFrame {
         jOK = new javax.swing.JButton();
         jLayeredPane1 = new javax.swing.JLayeredPane();
         jProgressBar = new javax.swing.JProgressBar();
+        jServer = new javax.swing.JTextField();
+        jOk2 = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Wybierz serwer");
@@ -141,36 +145,63 @@ public class ServerList extends javax.swing.JFrame {
         jProgressBar.setBounds(10, 0, 333, 14);
         jLayeredPane1.add(jProgressBar, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
+        jServer.setText("ollon.no-ip.org");
+
+        jOk2.setText("Ok");
+        jOk2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jOk2ActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setText("LAN");
+
+        jLabel2.setText("WAN");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLayeredPane1, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(56, 56, 56)
-                                .addComponent(jLista, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(38, 38, 38)
-                                .addComponent(jSzukaj))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLista, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jServer, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(30, 30, 30)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jSzukaj, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jOk2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 29, Short.MAX_VALUE)
+                                .addComponent(jOK))
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(152, 152, 152)
-                                .addComponent(jOK)))
-                        .addGap(0, 20, Short.MAX_VALUE))
-                    .addComponent(jLayeredPane1, javax.swing.GroupLayout.Alignment.TRAILING))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel1)
+                                    .addComponent(jLabel2))
+                                .addGap(0, 0, Short.MAX_VALUE)))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(33, 33, 33)
+                .addContainerGap()
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLista, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jSzukaj))
-                .addGap(47, 47, 47)
-                .addComponent(jOK)
-                .addGap(18, 18, 18)
+                    .addComponent(jSzukaj)
+                    .addComponent(jOK))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel2)
+                .addGap(3, 3, 3)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jServer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jOk2))
+                .addGap(40, 40, 40)
                 .addComponent(jLayeredPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -210,6 +241,15 @@ public class ServerList extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jOKActionPerformed
 
+    private void jOk2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOk2ActionPerformed
+        // TODO add your handling code here:
+        host = jServer.getText();
+        if(host!=null) {
+            abc.put(host);
+            setVisible(false);
+        }
+    }//GEN-LAST:event_jOk2ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -245,10 +285,14 @@ public class ServerList extends javax.swing.JFrame {
 //        });
 //    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLayeredPane jLayeredPane1;
     private javax.swing.JComboBox jLista;
     private javax.swing.JButton jOK;
+    private javax.swing.JButton jOk2;
     private javax.swing.JProgressBar jProgressBar;
+    private javax.swing.JTextField jServer;
     private javax.swing.JButton jSzukaj;
     // End of variables declaration//GEN-END:variables
 }

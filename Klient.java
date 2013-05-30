@@ -13,8 +13,6 @@ import com.esotericsoftware.kryonet.Listener.ThreadedListener;
 import Gra.Network.*;
 import com.esotericsoftware.minlog.Log;
 import java.awt.Color;
-import java.awt.Container;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics;
@@ -37,17 +35,16 @@ public class Klient extends JFrame {
     private Timer hideChat;
     private Timer move;
     private Timer attack;
+    private Timer checkAttack;
+    private Timer newChat;
+    private Timer immortal;
     
     private Image tlo;
-    private Image kolko;
-    private Image kolko2;
     private Image platformIm;
-//    private Image character1_r[];
-//    private Image character1_l[];
-//    private Image character1_right_move[];
-//    private Image character1_left_move[];
-//    private Image character1_right_attack[];
-//    private Image character1_left_attack[];
+    private Image life;
+    private Image dead;
+    private Image frag;
+    private Image staty;
     
     private Image characters[][][];
     
@@ -63,13 +60,31 @@ public class Klient extends JFrame {
     private int klatka = 0;
     
     private boolean lastMove = true;
+    
+    class Immortal extends TimerTask{
+
+        @Override
+        public void run() {
+            ui.characters.get(ui.ID).immortal = false;
+        }
+        
+    }
+    
+    class NewChat extends TimerTask{
+
+        @Override
+        public void run() {
+            openChat = false;
+        }
+        
+    }
 
     class Move extends TimerTask {
 
         @Override
         public void run() {
             klatka++;
-            if (klatka > 3) {
+            if (klatka > 5) {
                 klatka = 0;
             }
             player.set_b(klatka);
@@ -103,7 +118,7 @@ public class Klient extends JFrame {
                 spr = true;
             }
 
-            if (klawisze[4] && klawisze[5]) {
+            if (klawisze[5] && !openChat) {
                 Chat.show();
                 openChat = true;
                 setVisible(true); //ustawia focus na okno glowne
@@ -116,6 +131,7 @@ public class Klient extends JFrame {
             chooseImage(msg.x,klawisze[6]);
 
             if (spr) {
+                msg.attack = klawisze[6];
                 client.sendTCP(msg);
                 spr = false;
                 return;
@@ -138,6 +154,7 @@ public class Klient extends JFrame {
         }
     }
 
+    //nie jest używana chyba teraz
     class atak extends TimerTask {
 
         @Override
@@ -148,6 +165,52 @@ public class Klient extends JFrame {
         }
     }
 
+    class CheckAttack extends TimerTask{
+
+        @Override
+        public void run() {
+            if(ui.characters.get(ui.ID).immortal) return;
+            Iterator<Map.Entry<Integer, Character>> it = ui.characters.entrySet().iterator();
+        
+            while (it.hasNext()) {
+                
+                Character character = ui.characters.get(it.next().getKey());
+                if(character.id == ui.ID) continue;
+                if(!character.attack) continue;
+                
+                
+                int width = characters[character.image-1][character.a][character.b%4].getWidth(null);
+                int height = characters[character.image-1][character.a][character.b%4].getHeight(null);
+                int playerWidth =characters[ui.characters.get(ui.ID).image-1][player.get_a()][player.get_b()%4].getWidth(null);
+                
+                    
+                    if(character.a%2 == 0){
+                        if(character.x + width > 30+player.get_x()+playerWidth/2-player.get_w()/2 && character.x+width<30+player.get_x()+player.get_w()+playerWidth/2-player.get_w()/2)
+                            if(character.y+height/10>player.get_y() && character.y+height/2<player.get_y()+player.get_h())
+                                ui.characters.get(ui.ID).hp--;
+                        
+                        
+                    }else{
+                        if(character.x > player.get_x()+playerWidth/2-player.get_w()/2 && character.x+width/2 - player.get_w()/2<player.get_x()+player.get_w()+playerWidth/2)
+                            if(character.y+height/10>player.get_y() && character.y+height/2<player.get_y()+player.get_h())
+                                ui.characters.get(ui.ID).hp--;
+                    }
+                    if( ui.characters.get(ui.ID).hp == 0){
+                        dead(character);
+                        ui.characters.get(ui.ID).immortal = true;
+                        immortal = new Timer();
+                        immortal.schedule(new Immortal(), 15000);
+                        
+                    }
+                    
+                }
+
+            }
+
+        
+        
+    }
+    
     public Klient() {
         super("kolko");
 
@@ -191,6 +254,10 @@ public class Klient extends JFrame {
                     repaint();
                     return;
                 }
+                if (object instanceof NewPosition){
+                    ui.newPosition((NewPosition)object);
+                    return;
+                }
                 if (object instanceof SendChat) {
 
                     hideChat.cancel();
@@ -212,10 +279,20 @@ public class Klient extends JFrame {
                     map.set(info.id);
                     return;
                 }
+                if (object instanceof Kick){
+                    Kick kick = (Kick) object;
+                    
+                    if(kick.name.equals(name)){
+                        setAlwaysOnTop(false);
+                        JOptionPane.showMessageDialog(null, "Utracono połączenie z serwerem.", "KICK!", JOptionPane.INFORMATION_MESSAGE);
+                        System.exit(0);
+                    }
+                }
             }
 
             @Override
             public void disconnected(Connection connection) {
+                setAlwaysOnTop(false);
                 JOptionPane.showMessageDialog(null, "Utracono połączenie z serwerem.", "Błąd", JOptionPane.INFORMATION_MESSAGE);
                 System.exit(0);
             }
@@ -244,6 +321,7 @@ public class Klient extends JFrame {
         setVisible(true);
         setAlwaysOnTop(true);
         createBufferStrategy(2);
+        setFocusTraversalKeysEnabled(false);
         Chat = new chat();
 
 
@@ -256,9 +334,11 @@ public class Klient extends JFrame {
         
         
         tlo = new ImageIcon("images/tlo.jpg").getImage();
-        kolko = new ImageIcon("kolko.png").getImage();
-        kolko2 = new ImageIcon("kolko2.png").getImage();
+        life = new ImageIcon("images/life.png").getImage();
         platformIm = new ImageIcon("images/platform.jpg").getImage();
+        dead = new ImageIcon("images/dead.png").getImage();
+        frag = new ImageIcon("images/frag.png").getImage();
+        staty = new ImageIcon("images/staty.png").getImage();
 
         czat = new String[6];
 
@@ -282,7 +362,6 @@ public class Klient extends JFrame {
         this.addKeyListener(new KeyListener() {
             @Override
             public void keyPressed(KeyEvent e) {
-
                 if (openChat) {
                     if ((e.getKeyCode() > 43 && e.getKeyCode() < 94) || e.getKeyCode() == KeyEvent.VK_SPACE) {
                         napis += e.getKeyChar();
@@ -303,6 +382,9 @@ public class Klient extends JFrame {
                         client.sendTCP(info);
                         napis = "";
                         Chat.setText(napis);
+                        Chat.hide();
+                        newChat = new Timer();
+                        newChat.schedule(new NewChat(), 300);
                     }
                     if (e.getKeyCode() == 8) { //backspace
                         if (napis.length() > 0) {
@@ -324,7 +406,7 @@ public class Klient extends JFrame {
                     case KeyEvent.VK_RIGHT:
                         klawisze[3] = true;
                         break;
-                    case KeyEvent.VK_SHIFT:
+                    case KeyEvent.VK_TAB:
                         klawisze[4] = true;
                         break;
                     case KeyEvent.VK_ENTER:
@@ -357,7 +439,7 @@ public class Klient extends JFrame {
                     case KeyEvent.VK_RIGHT:
                         klawisze[3] = false;
                         break;
-                    case KeyEvent.VK_SHIFT:
+                    case KeyEvent.VK_TAB:
                         klawisze[4] = false;
                         break;
                     case KeyEvent.VK_ENTER:
@@ -378,6 +460,9 @@ public class Klient extends JFrame {
         zegar.scheduleAtFixedRate(new Zadanie(), 0, 40);
         move = new Timer();
         move.scheduleAtFixedRate(new Move(), 0, 300);
+        
+        checkAttack = new Timer();
+        checkAttack.scheduleAtFixedRate(new CheckAttack(), 0, 300);
         repaint();
     }
 
@@ -471,12 +556,19 @@ public class Klient extends JFrame {
             }
             character.x = msg.x;
             character.y = msg.y;
-//            character.right_move = msg.right_move;
-//            character.move = msg.move;
-//            character.attack = msg.attack;
             character.a = msg.a;
             character.b = msg.b;
-
+            character.attack = msg.attack;
+            character.dead = msg.dead;
+            character.frags = msg.frags;
+            
+        }
+        
+        
+        public void newPosition(NewPosition msg){
+            player.set_x(msg.x);
+            player.set_y(msg.y);
+            characters.get(ID).hp = msg.hp;
         }
 
         /**
@@ -522,8 +614,23 @@ public class Klient extends JFrame {
             setMap.id = i;
 
             client.sendTCP(setMap);
+            return;
+        }
+        if (napis.contains(".kick")){
+            napis = napis.replace(".kick ", "");
+            Kick kick = new Kick();
+            kick.name = napis;
+            client.sendTCP(kick);
+           // System.out.println(napis);
+            return;
         }
 
+    }
+    private void dead(Character character){
+        Dead dead = new Dead();
+        dead.characterID = character.id;
+        client.sendTCP(dead);
+        
     }
 
     public void chooseImage(int x,boolean attack) {
@@ -577,10 +684,16 @@ public class Klient extends JFrame {
     void loadImage(){
         
         characters = new Image[2][][];                  
-        characters[0] = new Image[6][];               
+        characters[0] = new Image[6][]; 
+        characters[1] = new Image[6][];
         
-        for(int i=0;i<6;i++){
+        for(int i=0;i<4;i++){
             characters[0][i] = new Image[4];
+            characters[1][i] = new Image[4];
+        }
+        for(int i=4;i<6;i++){
+            characters[0][i] = new Image[4];
+            characters[1][i] = new Image[6];
         }
         
         characters[0][0][0] = new ImageIcon("images/character1/bezruch_r/1.png").getImage();
@@ -613,9 +726,40 @@ public class Klient extends JFrame {
         characters[0][5][2] = new ImageIcon("images/character1/atak_l/3.png").getImage();
         characters[0][5][3] = new ImageIcon("images/character1/atak_l/4.png").getImage();
 
-        
-        
-        
+        characters[1][0][0] = new ImageIcon("images/character2/bezruch_r/1.png").getImage();
+        characters[1][0][1] = new ImageIcon("images/character2/bezruch_r/2.png").getImage();
+        characters[1][0][2] = new ImageIcon("images/character2/bezruch_r/3.png").getImage();
+        characters[1][0][3] = new ImageIcon("images/character2/bezruch_r/4.png").getImage();
+
+        characters[1][1][0] = new ImageIcon("images/character2/bezruch_l/1.png").getImage();
+        characters[1][1][1] = new ImageIcon("images/character2/bezruch_l/2.png").getImage();
+        characters[1][1][2] = new ImageIcon("images/character2/bezruch_l/3.png").getImage();
+        characters[1][1][3] = new ImageIcon("images/character2/bezruch_l/4.png").getImage();
+
+        characters[1][2][0] = new ImageIcon("images/character2/ruch_r/1.png").getImage();
+        characters[1][2][1] = new ImageIcon("images/character2/ruch_r/2.png").getImage();
+        characters[1][2][2] = new ImageIcon("images/character2/ruch_r/3.png").getImage();
+        characters[1][2][3] = new ImageIcon("images/character2/ruch_r/4.png").getImage();
+
+        characters[1][3][0] = new ImageIcon("images/character2/ruch_l/1.png").getImage();
+        characters[1][3][1] = new ImageIcon("images/character2/ruch_l/2.png").getImage();
+        characters[1][3][2] = new ImageIcon("images/character2/ruch_l/3.png").getImage();
+        characters[1][3][3] = new ImageIcon("images/character2/ruch_l/4.png").getImage();
+
+        characters[1][4][0] = new ImageIcon("images/character2/atak_r/1.png").getImage();
+        characters[1][4][1] = new ImageIcon("images/character2/atak_r/2.png").getImage();
+        characters[1][4][2] = new ImageIcon("images/character2/atak_r/3.png").getImage();
+        characters[1][4][3] = new ImageIcon("images/character2/atak_r/4.png").getImage();
+        characters[1][4][4] = new ImageIcon("images/character2/atak_r/5.png").getImage();
+        characters[1][4][5] = new ImageIcon("images/character2/atak_r/6.png").getImage();
+
+        characters[1][5][0] = new ImageIcon("images/character2/atak_l/1.png").getImage();
+        characters[1][5][1] = new ImageIcon("images/character2/atak_l/2.png").getImage();
+        characters[1][5][2] = new ImageIcon("images/character2/atak_l/3.png").getImage();
+        characters[1][5][3] = new ImageIcon("images/character2/atak_l/4.png").getImage();
+        characters[1][5][4] = new ImageIcon("images/character2/atak_l/5.png").getImage();
+        characters[1][5][5] = new ImageIcon("images/character2/atak_l/6.png").getImage();
+       
         
     }
     
@@ -639,6 +783,7 @@ public class Klient extends JFrame {
         } catch (NullPointerException e) {
             return;
         }
+        if(player == null) return;
 
         //Wyswietlanie tla
 
@@ -651,15 +796,30 @@ public class Klient extends JFrame {
         for (Platform platform : map.platforms) {
             g2d.drawImage(platformIm, player.get_ch_x() - (player.get_x() - platform.get_x()), player.get_ch_y() - (player.get_y() - platform.get_y()), null);
         }
-        
+        Image postac = null;
         //Wyswietlenie wszystkich postaci
         Iterator<Map.Entry<Integer, Character>> it = ui.characters.entrySet().iterator();
-        Image postac = kolko;
+        
         while (it.hasNext()) {
 
             Character character = ui.characters.get(it.next().getKey());
-           // postac = chooseImage(character.image, character.right_move, character.move, character.attack, (character.id + klatka) % 4);
-              postac = characters[character.image-1][character.a][character.b];
+            int klatka;
+            if(character.image == 2 && character.attack)
+                klatka = character.b%6;
+            else
+                klatka = character.b%4;
+            
+            try{
+                postac = characters[character.image-1][character.a][klatka];
+            }
+            catch (ArrayIndexOutOfBoundsException e){
+                postac = characters[character.image-1][character.a][character.b%4];
+            }
+            catch (NullPointerException e){
+                return;
+            }
+            if(postac == null) return;
+            
             if (character.x == player.get_x() && character.y == player.get_y()) {
                 ch_x = player.get_ch_x();
                 ch_y = player.get_ch_y();
@@ -669,12 +829,21 @@ public class Klient extends JFrame {
                 ch_y = player.get_ch_y() - (player.get_y() - character.y);
             }
 
-            g2d.drawImage(postac, ch_x, ch_y, null);
+            g2d.drawImage(postac, ch_x-(postac.getWidth(null)/2-player.get_w()/2), ch_y, null);
         }
 
-        g2d.setFont(new Font("Arial", Font.PLAIN, 12));
-
-
+        try{
+            for(int i=0;
+                i<ui.characters.get(ui.ID).hp;i++){
+            g2d.drawImage(life,i*25,30,null);
+        }
+        }
+        catch (NullPointerException e){
+            return;
+        }
+      
+        g2d.setFont(new Font("Arial", Font.BOLD, 12));
+        g2d.setPaint(Color.BLUE);
 
         
 
@@ -685,7 +854,41 @@ public class Klient extends JFrame {
                 }
             }
         }
+        
+        g2d.drawImage(frag, 600, 25, null);
+        g2d.drawImage(dead, 700, 25, null);
+        
+        g2d.setFont(new Font("Arial", Font.BOLD, 25));
+        g2d.setPaint(Color.black);
+        g2d.drawString(Integer.toString(ui.characters.get(ui.ID).frags),660,50);
+        g2d.setPaint(Color.RED);
+        g2d.drawString(Integer.toString(ui.characters.get(ui.ID).dead),740,50);
+     
+        if(klawisze[4]){
+            g2d.drawImage(staty, 0, 0, null);
+             Iterator<Map.Entry<Integer, Character>> it2 = ui.characters.entrySet().iterator();
+             g2d.drawString("ID", 150, 150);
+             g2d.drawString("nick", 250, 150);
+             g2d.drawString("kills", 450, 150);
+             g2d.drawString("deaths", 600, 150);
+             int i = 1;
+             g2d.setFont(new Font("Arial", Font.BOLD, 18));
+             g2d.setPaint(Color.black);
+            while (it2.hasNext()) {
 
+                Character character = ui.characters.get(it2.next().getKey());
+                g2d.drawString(Integer.toString(i), 150, 160+30*i);
+                g2d.drawString(character.name, 250, 160+30*i);
+                g2d.drawString(Integer.toString(character.frags), 450, 160+30*i);
+                g2d.drawString(Integer.toString(character.dead), 600, 160+30*i);
+                i++;
+                
+
+            }
+            
+        }
+        
+        
         g2d.dispose();
 
         bstrategy.show();
