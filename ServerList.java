@@ -19,8 +19,8 @@ public class ServerList extends javax.swing.JFrame {
      * Creates new form ServerList
      */
     String host;
-    int update=0;
-    int Time = 5000;
+    short update=0;
+    short Time = 5000;
     public Client client;
     public List<InetAddress> address;
     public Timer zegar;
@@ -39,12 +39,12 @@ public class ServerList extends javax.swing.JFrame {
             
             char[] buf=bufor.toCharArray();
         
-            int a=2;
-            int index=0;
+            short a=2;
+            short index=0;
         
             String[] adresy=new String[address.size()];
         
-            for(int i=0;i<address.size();i++){
+            for(short i=0;i<address.size();i++){
                 adresy[i]="";
             }
         
@@ -118,7 +118,6 @@ public class ServerList extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Wybierz serwer");
 
         jLista.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "localhost" }));
@@ -256,7 +255,7 @@ public class ServerList extends javax.swing.JFrame {
 //    public static void main(String args[]) {
 //        /* Set the Nimbus look and feel */
 //        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-//        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+//        /* If Nimbus (shortroduced in Java SE 6) is not available, stay with the default look and feel.
 //         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
 //         */
 //        try {

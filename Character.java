@@ -13,19 +13,19 @@ public class Character {
     /**
      * id postaci
      */
-    public int id;
+    public short id;
     /**
      * Wspolrzedna X postaci
      */
-    public int x;
+    public short x;
     /**
      * Wspolrzedna y postaci
      */
-    public int y;
+    public short y;
     /**
      * Obrazek postaci 1 lub 2
      */
-    public int image;
+    public short image;
     /**
      * true - uprawnienia admina
      * false - zwykły użytkownik
@@ -39,18 +39,19 @@ public class Character {
      * wyswietlana animacja + klatka
      * 
      */
-    public int a, b;
+    public short a;
     /**
      * ilosc życia postaci
      */
-    public int hp;
+    public short hp;
     /**
      * informacja ile razy postac zginela
      */
-    public int dead;
+    public short dead;
     /**
      * informacja o ilosci fragow
      */
-    public int frags;
+    public short frags;
     public boolean immortal;
+    public String password;
 }

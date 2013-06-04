@@ -27,7 +27,7 @@ public class chat {
     public void setText(String text){
         Chat.setText(text);
     }
-    public void move(int x,int y){
+    public void move(short x,short y){
         frame.setBounds(x, y, 800, 30);
     }
     public void setState(int i){

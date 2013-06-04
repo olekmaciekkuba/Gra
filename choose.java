@@ -1,63 +1,72 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package Gra;
 
 /**
- *Classa z funkcjami czekajacymi na siebie wzajemnie (wielowatkowosc).
- * 
- * Wywolujemy metode {@link choose#get} lub {@link choose#getString} , ktore czekaja odpowiednio na ustawienie zmiennych wybor lub napis
- * przez metody {@link choose#put}
- * 
+ * Classa z funkcjami czekajacymi na siebie wzajemnie (wielowatkowosc).
+ *
+ * Wywolujemy metode {@link choose#get} lub {@link choose#getString} , ktore
+ * czekaja odpowiednio na ustawienie zmiennych wybor lub napis przez metody
+ * {@link choose#put}
+ *
  * @author Olek
  */
 public class choose {
-        
-         private int wybor;
-         private String napis;
-         /**
-          * 
-          * @return zwraca wartosc zmiennej wybor 
-          */
-        synchronized  public int get(){
-          
-                try {
-                    wait();
-                }
-                catch(InterruptedException e){
-                }
-             return wybor;
+
+    private short wybor;
+    private String napis;
+
+    /**
+     *
+     * @return zwraca wartosc zmiennej wybor
+     */
+    synchronized public short get() {
+
+        try {
+            wait();
+        } catch (InterruptedException e) {
         }
-        /**
-         * 
-         * @return zwraca wartosc zmiennej napis 
-         */
-        synchronized public String getString(){
-           
-                try {
-                    wait();
-                }
-                catch(InterruptedException e){
-                 }
-            
-            return napis;
+        return wybor;
+    }
+
+    /**
+     *
+     * @return zwraca wartosc zmiennej napis
+     */
+    synchronized public String getString() {
+
+        try {
+            wait();
+        } catch (InterruptedException e) {
         }
-        /**
-         * 
-         * @param a ustawia zmienna wybor 
-         */
-        synchronized  public void put(int a){
-            wybor=a;
-            notify();
+
+        return napis;
+    }
+
+    /**
+     *
+     * @param a ustawia zmienna wybor
+     */
+    synchronized public void put(short a) {
+        wybor = a;
+        notify();
+    }
+
+    /**
+     *
+     * @param a ustawia zmienna napis
+     */
+    synchronized public void put(String a) {
+        napis = a;
+        notify();
+    }
+
+    synchronized public void kontynuuj() {
+        notify();
+    }
+
+    synchronized public void czekaj() {
+        try {
+            wait();
+        } catch (InterruptedException e) {
         }
-        /**
-         * 
-         * @param a ustawia zmienna napis 
-         */
-        synchronized public void put(String a){
-            napis=a;
-            notify();
-        }
-    
+    }
 }

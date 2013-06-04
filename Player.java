@@ -12,15 +12,13 @@ import Gra.Network.MoveCharacter;
  */
 public class Player {
 
-    private int x, vx = 3;     //definicje wspolrzednych, predkosci, szerokosci,
-    private int y, vy = 3;    //wysokosci i licznika potrzebnego przy skakaniu
-    private int w = 50, h = 74;
-    private int counter;
-    private int ch_x;
-    private int ch_y;
-    private int a, b;
+    private short x, vx = 3;     //definicje wspolrzednych, predkosci, szerokosci,
+    private short y, vy = 3;    //wysokosci i licznika potrzebnego przy skakaniu
+    private short w = 50, h = 74;
+    private short counter;
+    private short ch_x;
+    private short ch_y;
     private boolean ready;  //gotowosc do skoku
-   
     public boolean admin;
 
     Player() //konstruktory, uzywam drugiego
@@ -31,7 +29,7 @@ public class Player {
         ready = true;
     }
 
-    Player(int x, int y) {
+    Player(short x, short y) {
         this.x = x;
         this.y = y;
         counter = 0;
@@ -42,9 +40,11 @@ public class Player {
      *
      * @param n
      */
-    public MoveCharacter move(int n, boolean jump, boolean pCol) //funkcja ktora porusza playera
+    public MoveCharacter move(short n, boolean jump, boolean pCol) //funkcja ktora porusza playera
     {
         MoveCharacter msg = new MoveCharacter();
+        short old_x = x;
+        short old_y = y;
         msg.x = 0;
         msg.y = 0;
 
@@ -52,7 +52,7 @@ public class Player {
         {                         //na okreslona wysokosc, jednoczesnie 
             y -= vy;                //nie pozwalajac na lewitacje. 
             counter += 1;          //Moze sam to ogarniesz, ale jak cos to pytaj
-            msg.y -= vy;                    //W dodatku moze sie okazac, ze niektore 
+                                //W dodatku moze sie okazac, ze niektore 
             if (counter == 20) //warunki sie dubluja, ale to potem pomysle, 
             {                 //czy da sie to skrocic. Zamiast blokowac klawisz
                 ready = false; //zrobilem blokade skakania podczas spadania
@@ -69,11 +69,9 @@ public class Player {
         switch (n) //tutaj poziomie poruszanie sie
         {
             case 0: {
-                msg.x -= vx;
                 x -= vx;
 
                 if (check_collision_x()) {
-                    msg.x += vx;
                     x += vx;
                 }
 
@@ -81,11 +79,9 @@ public class Player {
             break; //prawo
             case 1: {
 
-                msg.x += vx;
                 x += vx;
 
                 if (check_collision_x()) {
-                    msg.x -= vx;
                     x -= vx;
                 }
 
@@ -96,12 +92,11 @@ public class Player {
 
         if (!(check_collision_y() || pCol) && !jump) //spadanie
         {
-            msg.y += vy;
             y += vy;
             ready = false;
         }
-        msg.a = a;
-        msg.b = b;
+        msg.x = (short) (old_x - x);
+        msg.y = (short) (old_y - y);
         new_x();
         new_y();
         return msg;
@@ -129,9 +124,9 @@ public class Player {
         if (x + w / 2 < 400) {
             ch_x = x;
         } else if (x + w / 2 > MapI.map_w - 400) {
-            ch_x = x - (MapI.map_w - 800);
+            ch_x = (short) (x - (MapI.map_w - 800));
         } else {
-            ch_x = 400 - w / 2;
+            ch_x = (short) (400 - w / 2);
         }
     }
 
@@ -139,57 +134,42 @@ public class Player {
         if (y + h / 2 < 300) {
             ch_y = y;
         } else if (y + h / 2 > MapI.map_h - 300) {
-            ch_y = y - (MapI.map_h - 600);
+            ch_y = (short) (y - (MapI.map_h - 600));
         } else {
-            ch_y = 300 - h / 2;
+            ch_y = (short) (300 - h / 2);
         }
 
     }
 
-    public int get_ch_x() {
+    public short get_ch_x() {
         return ch_x;
     }
 
-    public int get_ch_y() {
+    public short get_ch_y() {
         return ch_y;
     }
 
-    public int get_x() {
+    public short get_x() {
         return x;
     }
 
-    public int get_y() {
+    public short get_y() {
         return y;
     }
 
-    public int get_h() {
+    public short get_h() {
         return h;
     }
 
-    public int get_w() {
+    public short get_w() {
         return w;
     }
 
-    public void set_a(int a) {
-        this.a = a;
-    }
-
-    public int get_a(){
-        return a;
-    }
-    public void set_b(int b) {
-        this.b = b;
-    }
-    public int get_b(){
-        return b;
-    }
-    public void set_x(int x){
+    public void set_x(short x) {
         this.x = x;
     }
-    public void set_y(int y){
+
+    public void set_y(short y) {
         this.y = y;
     }
-    
-  
-    
 }
